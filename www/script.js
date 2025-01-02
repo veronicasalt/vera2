@@ -350,3 +350,132 @@ $(function () {
 		}
 	});
 });
+
+// Ensure Particle Canvas is Centered and Matches Blob Inner Circle
+function centerParticleCanvas() {
+    const theCanvas = document.getElementById('canvasOne');
+    const parent = theCanvas.parentElement; // The parent is `.square`
+
+    if (!theCanvas || !parent) {
+        console.warn('Canvas or parent container not found.');
+        return;
+    }
+
+    // Center the canvas
+    theCanvas.style.position = 'absolute';
+    theCanvas.style.top = '50%';
+    theCanvas.style.left = '50%';
+    theCanvas.style.transform = 'translate(-50%, -50%)';
+    theCanvas.style.zIndex = '2'; // Above the blob
+    theCanvas.style.pointerEvents = 'none';
+
+    // Match canvas size to inner circle
+    theCanvas.width = 180; // Match inner circle size
+    theCanvas.height = 180; // Match inner circle size
+
+    projCenterX = theCanvas.width / 2;
+    projCenterY = theCanvas.height / 2;
+
+    console.log('Canvas resized to match blob inner circle!');
+}
+
+// Particle Rendering with Fixed Radius
+function renderParticles() {
+    const canvas = document.getElementById('canvasOne');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+        console.warn('Canvas context not available.');
+        return;
+    }
+
+    // === Particle Configuration ===
+    let particleList = [];
+    const numParticles = 300; // Adjust Density
+    const sphereRad = 80; //Adjust Radius for Particle Area
+    const particleRad = 2.0; //Adjust Particle Size
+    const fLen = 180; //Adjust Perspective Depth
+    const turnSpeed = 2 * Math.PI / 1200; //Adjust Rotation Speed
+
+    let turnAngle = 0;
+
+    // Initialize Particles
+    function initParticles() {
+        for (let i = 0; i < numParticles; i++) {
+            const theta = Math.random() * 2 * Math.PI;
+            const phi = Math.acos(Math.random() * 2 - 1);
+
+            const x0 = sphereRad * Math.sin(phi) * Math.cos(theta);
+            const y0 = sphereRad * Math.sin(phi) * Math.sin(theta);
+            const z0 = sphereRad * Math.cos(phi);
+
+            particleList.push({
+                originalX: x0,
+                originalY: y0,
+                originalZ: z0,
+                x: x0,
+                y: y0,
+                z: z0,
+                velX: Math.random() * 0.05 - 0.025,
+                velY: Math.random() * 0.05 - 0.025,
+                velZ: Math.random() * 0.05 - 0.025,
+                alpha: 1.0,
+            });
+        }
+    }
+
+    // Draw and Animate Particles
+    function drawParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        turnAngle = (turnAngle + turnSpeed) % (2 * Math.PI);
+        const sinAngle = Math.sin(turnAngle);
+        const cosAngle = Math.cos(turnAngle);
+
+        particleList.forEach(p => {
+            // Update particle position
+            p.x += p.velX;
+            p.y += p.velY;
+            p.z += p.velZ;
+
+            // Constrain particles within the fixed sphere radius
+            const distanceFromCenter = Math.sqrt(p.x ** 2 + p.y ** 2 + p.z ** 2);
+            if (distanceFromCenter > sphereRad) {
+                p.x = p.originalX;
+                p.y = p.originalY;
+                p.z = p.originalZ;
+            }
+
+            // Apply rotation
+            const rotX = cosAngle * p.x + sinAngle * p.z;
+            const rotZ = -sinAngle * p.x + cosAngle * p.z;
+
+            const m = fLen / (fLen - rotZ);
+            const projX = projCenterX + rotX * m;
+            const projY = projCenterY + p.y * m;
+
+            // Alpha fades with depth
+            const alpha = Math.max(0, (1 - rotZ / fLen));
+
+            // Draw particle
+            ctx.beginPath();
+            ctx.arc(projX, projY, particleRad, 0, 2 * Math.PI);
+            ctx.fillStyle = `rgba(254, 67, 101, ${alpha})`;
+            ctx.fill();
+        });
+
+        requestAnimationFrame(drawParticles);
+    }
+
+    // Initialize and Start
+    initParticles();
+    drawParticles();
+}
+
+// Run Functions After Page Load and Resize
+window.addEventListener('load', () => {
+    centerParticleCanvas();
+    renderParticles();
+});
+window.addEventListener('resize', centerParticleCanvas);
+

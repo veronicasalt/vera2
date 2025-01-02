@@ -1,20 +1,42 @@
-body{
+/* General Page Styles */
+body {
     background-color: #f9cdad;
-    overflow-y: hidden;
-    overflow-x: hidden;
+    overflow: hidden;
+    margin: 0;
 }
 
-.square{
+/* Center Section */
+#Oval {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Main Shape Container */
+#VeraHood {
+    position: relative;
+    z-index: 1; /* Blob at the bottom */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Blob Animation */
+.square {
     position: relative;
     width: 400px;
     height: 400px;
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1; /* Ensure blob animations are visible */
 }
 
-/*blob that shows on screen !!border raius fix!!*/
-.square span:nth-child(1){
+/* Animated Blob Layers */
+.square span:nth-child(1) {
     position: absolute;
     top: 0;
     left: 0;
@@ -23,12 +45,11 @@ body{
     background-image: radial-gradient(#f9cdad 50%, #fe4365 40%);
     box-shadow: 0 0 50px rgb(254, 67, 101), inset 0 0 50px rgb(254, 67, 101);
     border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
-    transition: .5s;
     animation: animate1 6s linear infinite;
+    z-index: 1;
 }
 
-
-.square span:nth-child(2){
+.square span:nth-child(2) {
     position: absolute;
     top: 0;
     left: 0;
@@ -37,11 +58,11 @@ body{
     background-image: radial-gradient(#f9cdad 50%, #fe4365 40%);
     box-shadow: 0 0 50px rgb(254, 67, 101), inset 0 0 50px rgb(254, 67, 101);
     border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
-    transition: .5s;
     animation: animate2 4s linear infinite;
+    z-index: 1;
 }
 
-.square span:nth-child(3){
+.square span:nth-child(3) {
     position: absolute;
     top: 0;
     left: 0;
@@ -50,34 +71,58 @@ body{
     background-image: radial-gradient(#f9cdad 50%, #fe4365 40%);
     box-shadow: 0 0 50px rgb(254, 67, 101), inset 0 0 50px rgb(254, 67, 101);
     border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
-    transition: .5s;
-    animation: animate3 8s linear infinite;
+    animation: animate3 7s linear infinite;
+    z-index: 1;
 }
 
+/* Blob Animations */
 @keyframes animate1 {
-    0%{
+    0% {
         transform: rotate(0deg);
     }
-    100%{
+    100% {
         transform: rotate(360deg);
     }
 }
 
 @keyframes animate2 {
-    0%{
+    0% {
         transform: rotate(0deg);
     }
-    100%{
+    100% {
         transform: rotate(360deg);
     }
 }
 
 @keyframes animate3 {
-    0%{
+    0% {
         transform: rotate(0deg);
     }
-    100%{
+    100% {
         transform: rotate(360deg);
     }
 }
-    
+
+/* Particle Canvas Inside Blob Inner Circle */
+.square canvas#canvasOne {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px; /* Match the inner circle size */
+    height: 180px; /* Match the inner circle size */
+    z-index: 2; /* Above the blob */
+    pointer-events: none;
+    border-radius: 50%; /* Make the canvas circular */
+    overflow: hidden;
+}
+
+/* Text on Top */
+h5.text-light {
+    z-index: 3; /* Top layer */
+    position: relative;
+    text-align: center;
+    font-size: 1.5rem;
+    margin-top: 20px;
+    color: white;
+}
